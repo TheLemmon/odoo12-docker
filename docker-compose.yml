@@ -14,8 +14,6 @@ services:
     container_name: odoo12
     depends_on:
       - mydb
-    link:
-      - redis
     build:
       context: odoo/
       args:
