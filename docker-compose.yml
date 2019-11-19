@@ -1,0 +1,41 @@
+version: "3.0"
+services:
+  mydb:
+    image: postgres:10
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odooposspast
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+
+  odoo:
+    container_name: odoo12
+    depends_on:
+      - mydb
+    link:
+      - redis
+    build:
+      context: odoo/
+      args:
+        - GIT_BRANCH=12.0
+        - ODOO_VERSION=12.0
+        - GITHUB_TOKEN=
+        - DEFAULT_DEPTH=1
+    ports:
+      - "8069:8069"
+      - "8071:8071"
+      - "8072:8072"
+    env_file:
+      .env
+    volumes:
+      - ./odoo/.odoorc:/home/odoo.conf:rw
+      - ./odoo-addons:/home/odoo/odoo-addons:rw
+      - ./odoo-logs:/home/odoo/odoo-logs
+      - odoo-web-data:/var/lib/odoo
+    command: odoo --dev all
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
